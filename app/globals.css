@@ -1,26 +1,254 @@
 @import "tailwindcss";
 
+/*
+  Brand tokens lifted from modern_erp_admin and modern_erp_portal so this public
+  site reads as part of the same family: the pl-* orange ramp, the nl-* light
+  neutrals, and the nd-* dark neutrals, with shadcn style semantic aliases on top.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary ramp (light) */
+  --pl-50: #fff4eb;
+  --pl-100: #ffe0c2;
+  --pl-200: #ffcc99;
+  --pl-300: #ffb870;
+  --pl-400: #ff993e;
+  --pl-500: #ff800e;
+  --pl-600: #e6730d;
+  --pl-700: #cc660b;
+  --pl-800: #994d08;
+  --pl-900: #663305;
+
+  /* Neutral ramp (light) */
+  --nl-50: #f6f6f6;
+  --nl-100: #eeeeee;
+  --nl-200: #e2e2e2;
+  --nl-300: #cccccc;
+  --nl-400: #999999;
+  --nl-500: #8d8d8d;
+  --nl-600: #666666;
+  --nl-700: #404040;
+  --nl-800: #202020;
+  --nl-900: #111111;
+
+  /* Neutral ramp (dark) */
+  --nd-900: #0c0c0c;
+  --nd-800: #121212;
+  --nd-700: #181818;
+  --nd-600: #1f1f1f;
+  --nd-500: #2b2b2b;
+  --nd-400: #4d4d4d;
+  --nd-300: #808080;
+  --nd-200: #aeaeae;
+  --nd-100: #d4d4d4;
+  --nd-50: #e8e8e8;
+
+  /* Semantic aliases, light */
+  --background: var(--nl-50);
+  --foreground: var(--nl-800);
+  --card: #ffffff;
+  --card-foreground: var(--nl-800);
+  --primary: var(--pl-500);
+  --primary-foreground: #ffffff;
+  --muted: var(--nl-100);
+  /* nl-600, not nl-500: body copy needs 4.5:1 against the light background. */
+  --muted-foreground: var(--nl-600);
+  --accent: var(--pl-50);
+  --accent-foreground: var(--pl-700);
+  --border: var(--nl-200);
+  --ring: var(--pl-500);
+
+  --radius: 0.75rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Explicit dark choice wins in both directions. */
+:root[data-theme="dark"] {
+  --background: var(--nd-900);
+  --foreground: var(--nd-50);
+  --card: var(--nd-800);
+  --card-foreground: var(--nd-50);
+  --primary: var(--pl-500);
+  --primary-foreground: #1a1000;
+  --muted: var(--nd-700);
+  --muted-foreground: var(--nd-300);
+  --accent: var(--nd-700);
+  --accent-foreground: var(--pl-300);
+  --border: var(--nd-600);
+  --ring: var(--pl-500);
 }
 
+/* No stored choice and JavaScript disabled: fall back to the OS preference. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --background: var(--nd-900);
+    --foreground: var(--nd-50);
+    --card: var(--nd-800);
+    --card-foreground: var(--nd-50);
+    --primary: var(--pl-500);
+    --primary-foreground: #1a1000;
+    --muted: var(--nd-700);
+    --muted-foreground: var(--nd-300);
+    --accent: var(--nd-700);
+    --accent-foreground: var(--pl-300);
+    --border: var(--nd-600);
+    --ring: var(--pl-500);
   }
 }
 
+@theme inline {
+  --color-pl-50: var(--pl-50);
+  --color-pl-100: var(--pl-100);
+  --color-pl-200: var(--pl-200);
+  --color-pl-300: var(--pl-300);
+  --color-pl-400: var(--pl-400);
+  --color-pl-500: var(--pl-500);
+  --color-pl-600: var(--pl-600);
+  --color-pl-700: var(--pl-700);
+  --color-pl-800: var(--pl-800);
+  --color-pl-900: var(--pl-900);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-urbanist), system-ui, -apple-system, BlinkMacSystemFont,
+    Roboto, sans-serif;
+
+  --radius-brand: var(--radius);
+}
+
+* {
+  box-sizing: border-box;
+  letter-spacing: 0.035em;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+/* Keep native UI (scrollbars, form controls) in step with an explicit choice. */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
 body {
+  margin: 0;
+  min-height: 100%;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Long form legal copy. Kept here so the three policy pages stay plain markup. */
+.legal-copy > * + * {
+  margin-top: 1.15rem;
+}
+
+.legal-copy h2 {
+  margin-top: 2.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.legal-copy h3 {
+  margin-top: 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.legal-copy p,
+.legal-copy li {
+  color: var(--muted-foreground);
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+
+.legal-copy strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.legal-copy ul,
+.legal-copy ol {
+  padding-left: 1.25rem;
+}
+
+.legal-copy ul {
+  list-style: disc;
+}
+
+.legal-copy ol {
+  list-style: decimal;
+}
+
+.legal-copy li + li {
+  margin-top: 0.5rem;
+}
+
+.legal-copy a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Numbered card list. Opts out of the list and spacing rules above so the
+   flex gap is the only thing controlling the distance between cards. */
+.legal-copy .steps {
+  list-style: none;
+  padding-left: 0;
+}
+
+.legal-copy .steps li + li {
+  margin-top: 0;
+}
+
+/* Theme toggle icons. Swapped in CSS rather than React state so the button
+   renders identically on the server and never mismatches on hydration. */
+.theme-icon-moon {
+  display: block;
+}
+
+.theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-sun {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-moon {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-icon-sun {
+    display: block;
+  }
 }
